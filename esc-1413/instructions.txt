@@ -1,0 +1,9 @@
+Ipaddress and requests will need to be installed via pip or included with the script for it to function. 
+
+A service account will be needed for this script to run under, and a task for running the script will need to be added to that account's crontab. It will look something like:
+
+0 8 * * * python3 /path/to/add_ips.py
+
+A new threat will need to be manually created in IDR for indicators to be uploaded to. It doesn't matter what goes in this threat initially as that will get replaced when the script runs. The threat key will then be copied into the script. 
+
+Additionally, the customer will need to provide, or allow us to create, an API key for the script to use.
