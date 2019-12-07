@@ -1,0 +1,29 @@
+WITH
+vuln_count AS (
+        SELECT
+                dv.nexpose_id,
+                COUNT(DISTINCT favi.asset_id) AS instances
+        FROM fact_asset_vulnerability_instance favi
+        JOIN dim_vulnerability dv ON dv.vulnerability_id=favi.vulnerability_id
+        GROUP BY dv.nexpose_id
+)
+
+SELECT
+ nexpose_id,
+ title,
+ date_published,
+ date_added,
+ date_modified,
+ cvss_vector,
+ ROUND(cvss_score::numeric,1) as cvss_score,
+ cvss_v3_vector,
+ ROUND(cvss_v3_score::numeric,1) as cvss_v3_score,
+ denial_of_service,
+ exploits,
+ malware_kits,
+ ROUND(risk_score::numeric,1) AS "Rapid7 Risk Score",
+ COALESCE(vc.instances,0) AS "Instances"
+FROM dim_vulnerability
+LEFT JOIN vuln_count vc USING(nexpose_id)
+WHERE date_added > now()- interval '31 day' AND cvss_score >=7
+ORDER BY cvss_score desc
