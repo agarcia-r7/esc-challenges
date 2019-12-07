@@ -1,0 +1,21 @@
+WITH
+scanned_assets AS (
+    SELECT scan_id, COUNT(asset_id) AS assets_scanned
+    FROM dim_scan
+    JOIN fact_asset_event fae USING (scan_id)
+    WHERE started > now() - interval '480 hours'
+    GROUP BY scan_id
+)
+SELECT
+ dsi.name AS "Site",
+ ds.scan_name AS "Scan Name",
+ ds.type AS "Scan Type",
+ ds.started AS "Scan Started",
+ ds.finished AS "Scan Completed",
+ ds.status AS "Status",
+ sa.assets_scanned AS "Assets Scanned"
+FROM dim_scan ds
+JOIN dim_site dsi on dsi.site_id = ds.site_id
+JOIN scanned_assets sa USING (scan_id)
+WHERE started > now() - interval '20 day'
+ORDER BY ds.started DESC
